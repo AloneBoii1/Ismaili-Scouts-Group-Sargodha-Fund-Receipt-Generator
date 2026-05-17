@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ismaili Scouts Sargodha - Receipt System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --scout-green: #006B3F;
+            --scout-gold: #C8AA57;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            max-width: 950px;
+            width: 100%;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .workspace {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* --- Left Side: Controls Form --- */
+        .form-side {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-side h2 {
+            color: var(--scout-green);
+            margin-bottom: 25px;
+            font-size: 24px;
+            border-bottom: 3px solid var(--scout-gold);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--scout-green);
+            box-shadow: 0 0 0 3px rgba(0, 107, 63, 0.1);
+        }
+
+        .download-btn {
+            background-color: var(--scout-green);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 107, 63, 0.2);
+        }
+
+        .download-btn:hover {
+            background-color: #004d2d;
+        }
+
+        /* --- Right Side: Receipt Card --- */
+        .preview-side {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .receipt-card {
+            width: 360px;
+            height: 640px;
+            background-color: #F4F4F4;
+            border: 12px solid var(--scout-gold);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .receipt-header-bar {
+            background-color: var(--scout-green);
+            height: 56px;
+            width: 100%;
+        }
+
+        .receipt-footer-bar {
+            background-color: var(--scout-green);
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            font-size: 12px;
+            font-weight: normal;
+            letter-spacing: 0.2px;
+        }
+
+        .receipt-body {
+            flex-grow: 1;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Watermark Layout Container */
+        .watermark-overlay {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 290px;
+            height: 290px;
+            pointer-events: none;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Embedded Logo Image Configuration */
+        .watermark-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.11; 
+        }
+
+        .main-title {
+            color: var(--scout-green);
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            z-index: 1;
+        }
+
+        .pill-badge {
+            background-color: var(--scout-green);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 7px 45px;
+            border-radius: 14px;
+            margin: 18px 0;
+            z-index: 1;
+        }
+
+        .message-text {
+            color: #000000;
+            font-size: 12.5px;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 22px;
+            z-index: 1;
+        }
+
+        /* Center Data Grid Box */
+        .square-data-box {
+            border: 6px solid var(--scout-green);
+            width: 260px;
+            height: 260px;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(244, 244, 244, 0.85);
+            z-index: 1;
+        }
+
+        .input-row {
+            font-size: 13px;
+            color: #000000;
+            border-bottom: 1.5px solid #000000;
+            padding-bottom: 2px;
+            margin: 11px 0;
+            width: 100%;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .input-row .field-label {
+            font-weight: normal;
+            white-space: nowrap;
+            margin-right: 5px;
+        }
+
+        .input-row .field-value {
+            font-weight: bold;
+            color: var(--scout-green);
+            font-size: 14px;
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="workspace">
+    
+    <div class="form-side">
+        <h2>Receipt Generator</h2>
+        <div class="form-group">
+            <label for="input-name">Scout Name</label>
+            <input type="text" id="input-name" placeholder="Enter scout's name" value="Shaheer Ali">
+        </div>
+        <div class="form-group">
+            <label for="input-month">Month</label>
+            <select id="input-month">
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May" selected>May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="input-amount">Amount (PKR)</label>
+            <input type="text" id="input-amount" placeholder="e.g. 1500" value="1500">
+        </div>
+        <div class="form-group">
+            <label for="input-date">Date Received</label>
+            <input type="date" id="input-date">
+        </div>
+        
+        <button class="download-btn" id="save-snapshot-btn">Download PNG Receipt</button>
+    </div>
+
+    <div class="preview-side">
+        <div class="receipt-card" id="capture-target-card">
+            
+            <div class="receipt-header-bar"></div>
+            
+            <div class="receipt-body">
+                <div class="watermark-overlay">
+                    <img class="watermark-img" id="watermark-logo" src="image.png" alt="Watermark Seal">
+                </div>
+
+                <div class="main-title">PAYMENT<br>RECEIVED</div>
+                <div class="pill-badge">Thank You!</div>
+                
+                <div class="message-text">
+                    We are pleased to confirm that your<br>monthly scout fund has been received
+                </div>
+                
+                <div class="square-data-box">
+                    <div class="input-row">
+                        <span class="field-label">Scout Name :</span>
+                        <span class="field-value" id="view-name">Shaheer Ali</span>
+                    </div>
+                    <div class="input-row">
+                        <span class="field-label">Month :</span>
+                        <span class="field-value" id="view-month">May</span>
+                    </div>
+                    <div class="input-row">
+                        <span class="field-label">Amount :</span>
+                        <span class="field-value" id="view-amount">1500 PKR</span>
+                    </div>
+                    <div class="input-row">
+                        <span class="field-label">Date :</span>
+                        <span class="field-value" id="view-date"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="receipt-footer-bar">
+                Thank you for being a part of our mission !
+            </div>
+            
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // UI Connections
+    const inputName = document.getElementById('input-name');
+    const inputMonth = document.getElementById('input-month');
+    const inputAmount = document.getElementById('input-amount');
+    const inputDate = document.getElementById('input-date');
+
+    const viewName = document.getElementById('view-name');
+    const viewMonth = document.getElementById('view-month');
+    const viewAmount = document.getElementById('view-amount');
+    const viewDate = document.getElementById('view-date');
+
+    // Auto set current today date parameters
+    const todayDate = new Date();
+    inputDate.value = todayDate.toISOString().split('T');
+    formatDisplayDate(inputDate.value);
+
+    function formatDisplayDate(val) {
+        if(!val) { viewDate.innerText = ""; return; }
+        const segments = val.split('-');
+        viewDate.innerText = `${segments}-${segments}-${segments}`;
+    }
+
+    // Input Listeners for Instant Keystroke Live Updating
+    inputName.addEventListener('input', (e) => viewName.innerText = e.target.value || " ");
+    inputMonth.addEventListener('change', (e) => viewMonth.innerText = e.target.value);
+    inputAmount.addEventListener('input', (e) => {
+        viewAmount.innerText = e.target.value ? `${e.target.value} PKR` : '';
+    });
+    inputDate.addEventListener('input', (e) => formatDisplayDate(e.target.value));
+
+
+    // Convert local image to safe base64 inline code strings upon load automatically
+    window.addEventListener('DOMContentLoaded', () => {
+        const logoImg = document.getElementById('watermark-logo');
+        
+        // Target your layout file image name context 
+        const testImage = new Image();
+        testImage.src = 'image.png'; // Make sure this file matches your folder location!
+        
+        testImage.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = testImage.width;
+            canvas.height = testImage.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(testImage, 0, 0);
+            
+            // Re-assign image source to secure string variables
+            logoImg.src = canvas.toDataURL('image/png');
+        };
+    });
+
+    // Clean Snapshot Renderer Processing Engine
+    document.getElementById('save-snapshot-btn').addEventListener('click', () => {
+        const targetCard = document.getElementById('capture-target-card');
+        
+        // Execute clean download build streams
+        html2canvas(targetCard, {
+            scale: 3, 
+            useCORS: false,    // Switched off to allow local offline file streams safely
+            allowTaint: true,   // Allows local desktop images to blend into canvas smoothly
+            logging: false
+        }).then(canvasInstance => {
+            const downloadTrigger = document.createElement('a');
+            const fileTitle = inputName.value.trim().replace(/\s+/g, '_') || 'Scout';
+            
+            downloadTrigger.download = `Ismaili_Scouts_Receipt_${fileTitle}.png`;
+            downloadTrigger.href = canvasInstance.toDataURL('image/png');
+            downloadTrigger.click();
+        });
+    });
+</script>
+
+</body>
+</html>
