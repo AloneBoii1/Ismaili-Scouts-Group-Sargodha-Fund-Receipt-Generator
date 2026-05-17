@@ -46,6 +46,7 @@
             }
         }
 
+        /* --- Left Side: Control Form --- */
         .form-side {
             display: flex;
             flex-direction: column;
@@ -96,7 +97,7 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, opacity 0.2s;
             margin-top: 10px;
             box-shadow: 0 4px 12px rgba(0, 107, 63, 0.2);
         }
@@ -105,7 +106,13 @@
             background-color: #004d2d;
         }
 
-        /* --- Right Side: Receipt Card --- */
+        .download-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* --- Right Side: Live Receipt Preview --- */
         .preview-side {
             display: flex;
             justify-content: center;
@@ -156,8 +163,8 @@
             top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 290px;
-            height: 290px;
+            width: 280px;
+            height: 280px;
             pointer-events: none;
             z-index: 0;
             display: flex;
@@ -165,12 +172,11 @@
             align-items: center;
         }
 
-        /* Embedded Logo Image Configuration */
         .watermark-img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            opacity: 0.11; 
+            opacity: 0.10; 
         }
 
         .main-title {
@@ -204,43 +210,44 @@
             z-index: 1;
         }
 
-        /* Center Data Grid Box */
+        /* Central Form Content Data Box (Fixed Layout) */
         .square-data-box {
             border: 6px solid var(--scout-green);
-            width: 260px;
-            height: 260px;
-            padding: 20px 12px;
+            width: 280px;
+            height: 250px;
+            padding: 15px 18px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            background: rgba(244, 244, 244, 0.85);
+            justify-content: space-evenly;
+            background: rgba(244, 244, 244, 0.85); 
             z-index: 1;
         }
 
+        /* Flex container with custom line margins for neat field layout formatting */
         .input-row {
-            font-size: 13px;
-            color: #000000;
-            border-bottom: 1.5px solid #000000;
-            padding-bottom: 2px;
-            margin: 11px 0;
-            width: 100%;
             display: flex;
             align-items: baseline;
+            width: 100%;
+            border-bottom: 1.5px solid #000000;
+            padding-bottom: 3px;
         }
 
         .input-row .field-label {
+            font-size: 14px;
             font-weight: normal;
+            color: #000000;
             white-space: nowrap;
-            margin-right: 5px;
+            margin-right: 8px;
         }
 
+        /* Fully working center aligned dynamic inputs values */
         .input-row .field-value {
+            font-size: 15px;
             font-weight: bold;
             color: var(--scout-green);
-            font-size: 14px;
             flex-grow: 1;
-            text-align: left;
-            padding-left: 4px;
+            text-align: center;
+            padding-right: 15px; /* Balances out the offset from the label on the left side */
         }
     </style>
 </head>
@@ -252,11 +259,11 @@
         <h2>Receipt Generator</h2>
         <div class="form-group">
             <label for="input-name">Scout Name</label>
-            <input type="text" id="input-name" placeholder="Enter scout's name" value="Shaheer Ali">
+            <input type="text" id="input-name" placeholder="Enter scout's name" value="Shaheer Ali" oninput="updateReceiptPreview()">
         </div>
         <div class="form-group">
             <label for="input-month">Month</label>
-            <select id="input-month">
+            <select id="input-month" onchange="updateReceiptPreview()">
                 <option value="January">January</option>
                 <option value="February">February</option>
                 <option value="March">March</option>
@@ -273,11 +280,11 @@
         </div>
         <div class="form-group">
             <label for="input-amount">Amount (PKR)</label>
-            <input type="text" id="input-amount" placeholder="e.g. 1500" value="1500">
+            <input type="text" id="input-amount" placeholder="e.g. 1500" value="1500" oninput="updateReceiptPreview()">
         </div>
         <div class="form-group">
             <label for="input-date">Date Received</label>
-            <input type="date" id="input-date">
+            <input type="date" id="input-date" oninput="updateReceiptPreview()">
         </div>
         
         <button class="download-btn" id="save-snapshot-btn">Download PNG Receipt</button>
@@ -290,7 +297,7 @@
             
             <div class="receipt-body">
                 <div class="watermark-overlay">
-                    <img class="watermark-img" id="watermark-logo" src="image.png" alt="Watermark Seal">
+                    <img class="watermark-img" src="image.png" alt="Watermark Logo">
                 </div>
 
                 <div class="main-title">PAYMENT<br>RECEIVED</div>
@@ -303,15 +310,15 @@
                 <div class="square-data-box">
                     <div class="input-row">
                         <span class="field-label">Scout Name :</span>
-                        <span class="field-value" id="view-name">Shaheer Ali</span>
+                        <span class="field-value" id="view-name"></span>
                     </div>
                     <div class="input-row">
                         <span class="field-label">Month :</span>
-                        <span class="field-value" id="view-month">May</span>
+                        <span class="field-value" id="view-month"></span>
                     </div>
                     <div class="input-row">
                         <span class="field-label">Amount :</span>
-                        <span class="field-value" id="view-amount">1500 PKR</span>
+                        <span class="field-value" id="view-amount"></span>
                     </div>
                     <div class="input-row">
                         <span class="field-label">Date :</span>
@@ -330,66 +337,52 @@
 </div>
 
 <script>
-    // UI Connections
+    // Primary Input Selectors
     const inputName = document.getElementById('input-name');
     const inputMonth = document.getElementById('input-month');
     const inputAmount = document.getElementById('input-amount');
     const inputDate = document.getElementById('input-date');
 
+    // Primary Preview Selectors
     const viewName = document.getElementById('view-name');
     const viewMonth = document.getElementById('view-month');
     const viewAmount = document.getElementById('view-amount');
     const viewDate = document.getElementById('view-date');
+    const downloadBtn = document.getElementById('save-snapshot-btn');
 
-    // Auto set current today date parameters
+    // Fallback default setup on window initialize
     const todayDate = new Date();
     inputDate.value = todayDate.toISOString().split('T');
-    formatDisplayDate(inputDate.value);
 
-    function formatDisplayDate(val) {
-        if(!val) { viewDate.innerText = ""; return; }
-        const segments = val.split('-');
-        viewDate.innerText = `${segments}-${segments}-${segments}`;
+    // Single pipeline function to prevent canvas looping bugs
+    function updateReceiptPreview() {
+        viewName.textContent = inputName.value.trim() || "";
+        viewMonth.textContent = inputMonth.value;
+        viewAmount.textContent = inputAmount.value ? `${inputAmount.value} PKR` : "";
+        
+        const dateVal = inputDate.value;
+        if (dateVal) {
+            const segments = dateVal.split('-');
+            viewDate.textContent = `${segments}-${segments}-${segments}`;
+        } else {
+            viewDate.textContent = "";
+        }
     }
 
-    // Input Listeners for Instant Keystroke Live Updating
-    inputName.addEventListener('input', (e) => viewName.innerText = e.target.value || " ");
-    inputMonth.addEventListener('change', (e) => viewMonth.innerText = e.target.value);
-    inputAmount.addEventListener('input', (e) => {
-        viewAmount.innerText = e.target.value ? `${e.target.value} PKR` : '';
-    });
-    inputDate.addEventListener('input', (e) => formatDisplayDate(e.target.value));
+    // Run preview rendering sequence immediately on page display load
+    updateReceiptPreview();
 
-
-    // Convert local image to safe base64 inline code strings upon load automatically
-    window.addEventListener('DOMContentLoaded', () => {
-        const logoImg = document.getElementById('watermark-logo');
-        
-        // Target your layout file image name context 
-        const testImage = new Image();
-        testImage.src = 'image.png'; // Make sure this file matches your folder location!
-        
-        testImage.onload = function() {
-            const canvas = document.createElement('canvas');
-            canvas.width = testImage.width;
-            canvas.height = testImage.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(testImage, 0, 0);
-            
-            // Re-assign image source to secure string variables
-            logoImg.src = canvas.toDataURL('image/png');
-        };
-    });
-
-    // Clean Snapshot Renderer Processing Engine
-    document.getElementById('save-snapshot-btn').addEventListener('click', () => {
+    // Canvas Capture Execution Link Channel
+    downloadBtn.addEventListener('click', () => {
         const targetCard = document.getElementById('capture-target-card');
         
-        // Execute clean download build streams
+        downloadBtn.disabled = true;
+        downloadBtn.innerText = "Generating File...";
+        
         html2canvas(targetCard, {
-            scale: 3, 
-            useCORS: false,    // Switched off to allow local offline file streams safely
-            allowTaint: true,   // Allows local desktop images to blend into canvas smoothly
+            scale: 3,           
+            useCORS: true,      
+            allowTaint: false,
             logging: false
         }).then(canvasInstance => {
             const downloadTrigger = document.createElement('a');
@@ -398,6 +391,13 @@
             downloadTrigger.download = `Ismaili_Scouts_Receipt_${fileTitle}.png`;
             downloadTrigger.href = canvasInstance.toDataURL('image/png');
             downloadTrigger.click();
+            
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Download PNG Receipt";
+        }).catch(err => {
+            console.error(err);
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Download PNG Receipt";
         });
     });
 </script>
