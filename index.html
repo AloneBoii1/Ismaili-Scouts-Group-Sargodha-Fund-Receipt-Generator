@@ -46,7 +46,7 @@
             }
         }
 
-        /* --- Left Side: Control Form Panel --- */
+        /* --- Left Side: Control Form --- */
         .form-side {
             display: flex;
             flex-direction: column;
@@ -112,7 +112,7 @@
             box-shadow: none;
         }
 
-        /* --- Right Side: Live Receipt Preview Card --- */
+        /* --- Right Side: Live Receipt Preview --- */
         .preview-side {
             display: flex;
             justify-content: center;
@@ -157,7 +157,7 @@
             position: relative;
         }
 
-        /* Centered Watermark Overlay Wrapper */
+        /* Watermark Layout Container */
         .watermark-overlay {
             position: absolute;
             top: 55%;
@@ -210,7 +210,7 @@
             z-index: 1;
         }
 
-        /* Central Form Content Data Box (Crisp Structural Borders) */
+        /* Central Form Content Data Box (Fixed Layout) */
         .square-data-box {
             border: 6px solid var(--scout-green);
             width: 280px;
@@ -223,7 +223,7 @@
             z-index: 1;
         }
 
-        /* Flex container mapping layout rows safely */
+        /* Flex container with custom line margins for neat field layout formatting */
         .input-row {
             display: flex;
             align-items: baseline;
@@ -240,14 +240,14 @@
             margin-right: 8px;
         }
 
-        /* Flawless center-aligned rendering engine */
+        /* Fully working center aligned dynamic inputs values */
         .input-row .field-value {
             font-size: 15px;
             font-weight: bold;
             color: var(--scout-green);
             flex-grow: 1;
             text-align: center;
-            padding-right: 15px; /* Completely balances the structural offset from the left label */
+            padding-right: 15px; /* Balances out the offset from the label on the left side */
         }
     </style>
 </head>
@@ -297,7 +297,7 @@
             
             <div class="receipt-body">
                 <div class="watermark-overlay">
-                    <img class="watermark-img" src="Your paragraph text (1).jpg" alt="Watermark Logo">
+                    <img class="watermark-img" src="image.png" alt="Watermark Logo">
                 </div>
 
                 <div class="main-title">PAYMENT<br>RECEIVED</div>
@@ -337,26 +337,70 @@
 </div>
 
 <script>
-    // Document Connectors
+    // Primary Input Selectors
     const inputName = document.getElementById('input-name');
     const inputMonth = document.getElementById('input-month');
     const inputAmount = document.getElementById('input-amount');
     const inputDate = document.getElementById('input-date');
 
+    // Primary Preview Selectors
     const viewName = document.getElementById('view-name');
     const viewMonth = document.getElementById('view-month');
     const viewAmount = document.getElementById('view-amount');
     const viewDate = document.getElementById('view-date');
     const downloadBtn = document.getElementById('save-snapshot-btn');
 
-    // Secure default initial timestamp configurations
+    // Fallback default setup on window initialize
     const todayDate = new Date();
     inputDate.value = todayDate.toISOString().split('T');
 
-    // Central Data-Binding Function (Eliminates html2canvas string duplication bugs)
+    // Single pipeline function to prevent canvas looping bugs
     function updateReceiptPreview() {
         viewName.textContent = inputName.value.trim() || "";
         viewMonth.textContent = inputMonth.value;
         viewAmount.textContent = inputAmount.value ? `${inputAmount.value} PKR` : "";
         
-        // Split parser that flips incoming YYYY-MM-
+        const dateVal = inputDate.value;
+        if (dateVal) {
+            const segments = dateVal.split('-');
+            viewDate.textContent = `${segments}-${segments}-${segments}`;
+        } else {
+            viewDate.textContent = "";
+        }
+    }
+
+    // Run preview rendering sequence immediately on page display load
+    updateReceiptPreview();
+
+    // Canvas Capture Execution Link Channel
+    downloadBtn.addEventListener('click', () => {
+        const targetCard = document.getElementById('capture-target-card');
+        
+        downloadBtn.disabled = true;
+        downloadBtn.innerText = "Generating File...";
+        
+        html2canvas(targetCard, {
+            scale: 3,           
+            useCORS: true,      
+            allowTaint: false,
+            logging: false
+        }).then(canvasInstance => {
+            const downloadTrigger = document.createElement('a');
+            const fileTitle = inputName.value.trim().replace(/\s+/g, '_') || 'Scout';
+            
+            downloadTrigger.download = `Ismaili_Scouts_Receipt_${fileTitle}.png`;
+            downloadTrigger.href = canvasInstance.toDataURL('image/png');
+            downloadTrigger.click();
+            
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Download PNG Receipt";
+        }).catch(err => {
+            console.error(err);
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Download PNG Receipt";
+        });
+    });
+</script>
+
+</body>
+</html>
