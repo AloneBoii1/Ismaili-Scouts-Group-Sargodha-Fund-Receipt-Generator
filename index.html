@@ -352,7 +352,7 @@
 
     // Fallback default setup on window initialize
     const todayDate = new Date();
-    inputDate.value = todayDate.toISOString().split('T');
+   inputDate.value = todayDate.toISOString().split('T')[0]; 
 
     // Single pipeline function to prevent canvas looping bugs
     function updateReceiptPreview() {
