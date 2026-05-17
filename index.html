@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ismaili Scouts Sargodha - Receipt System</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         :root {
             --scout-green: #006B3F;
@@ -15,7 +17,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         body {
@@ -46,7 +48,7 @@
             }
         }
 
-        /* --- Left Side: Control Form --- */
+        /* LEFT SIDE */
         .form-side {
             display: flex;
             flex-direction: column;
@@ -73,19 +75,21 @@
             font-size: 14px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 12px 14px;
             border: 2px solid #e1e1e1;
             border-radius: 8px;
             font-size: 15px;
-            transition: all 0.3s;
+            transition: 0.3s;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: var(--scout-green);
-            box-shadow: 0 0 0 3px rgba(0, 107, 63, 0.1);
+            box-shadow: 0 0 0 3px rgba(0,107,63,0.1);
         }
 
         .download-btn {
@@ -97,9 +101,9 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s, opacity 0.2s;
+            transition: 0.2s;
             margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(0, 107, 63, 0.2);
+            box-shadow: 0 4px 12px rgba(0,107,63,0.2);
         }
 
         .download-btn:hover {
@@ -112,7 +116,7 @@
             box-shadow: none;
         }
 
-        /* --- Right Side: Live Receipt Preview --- */
+        /* RIGHT SIDE */
         .preview-side {
             display: flex;
             justify-content: center;
@@ -144,8 +148,6 @@
             text-align: center;
             padding: 15px 10px;
             font-size: 12px;
-            font-weight: normal;
-            letter-spacing: 0.2px;
         }
 
         .receipt-body {
@@ -157,7 +159,6 @@
             position: relative;
         }
 
-        /* Watermark Layout Container */
         .watermark-overlay {
             position: absolute;
             top: 55%;
@@ -176,7 +177,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            opacity: 0.10; 
+            opacity: 0.10;
         }
 
         .main-title {
@@ -185,7 +186,6 @@
             font-weight: 700;
             text-align: center;
             line-height: 1.1;
-            letter-spacing: 0.5px;
             margin-top: 10px;
             z-index: 1;
         }
@@ -202,7 +202,7 @@
         }
 
         .message-text {
-            color: #000000;
+            color: #000;
             font-size: 12.5px;
             text-align: center;
             line-height: 1.4;
@@ -210,7 +210,6 @@
             z-index: 1;
         }
 
-        /* Central Form Content Data Box (Fixed Layout) */
         .square-data-box {
             border: 6px solid var(--scout-green);
             width: 280px;
@@ -219,187 +218,263 @@
             display: flex;
             flex-direction: column;
             justify-content: space-evenly;
-            background: rgba(244, 244, 244, 0.85); 
+            background: rgba(244,244,244,0.85);
             z-index: 1;
         }
 
-        /* Flex container with custom line margins for neat field layout formatting */
         .input-row {
             display: flex;
             align-items: baseline;
             width: 100%;
-            border-bottom: 1.5px solid #000000;
+            border-bottom: 1.5px solid #000;
             padding-bottom: 3px;
         }
 
-        .input-row .field-label {
+        .field-label {
             font-size: 14px;
-            font-weight: normal;
-            color: #000000;
-            white-space: nowrap;
             margin-right: 8px;
+            white-space: nowrap;
         }
 
-        /* Fully working center aligned dynamic inputs values */
-        .input-row .field-value {
+        .field-value {
             font-size: 15px;
             font-weight: bold;
             color: var(--scout-green);
             flex-grow: 1;
             text-align: center;
-            padding-right: 15px; /* Balances out the offset from the label on the left side */
+            padding-right: 15px;
         }
     </style>
 </head>
+
 <body>
 
 <div class="workspace">
-    
+
+    <!-- FORM SIDE -->
     <div class="form-side">
+
         <h2>Receipt Generator</h2>
+
         <div class="form-group">
             <label for="input-name">Scout Name</label>
-            <input type="text" id="input-name" placeholder="Enter scout's name" value="Shaheer Ali" oninput="updateReceiptPreview()">
+            <input type="text"
+                   id="input-name"
+                   placeholder="Enter scout's name"
+                   value="Shaheer Ali"
+                   oninput="updateReceiptPreview()">
         </div>
+
         <div class="form-group">
             <label for="input-month">Month</label>
+
             <select id="input-month" onchange="updateReceiptPreview()">
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May" selected>May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
+                <option>January</option>
+                <option>February</option>
+                <option>March</option>
+                <option>April</option>
+                <option selected>May</option>
+                <option>June</option>
+                <option>July</option>
+                <option>August</option>
+                <option>September</option>
+                <option>October</option>
+                <option>November</option>
+                <option>December</option>
             </select>
         </div>
+
         <div class="form-group">
             <label for="input-amount">Amount (PKR)</label>
-            <input type="text" id="input-amount" placeholder="e.g. 1500" value="1500" oninput="updateReceiptPreview()">
+
+            <input type="text"
+                   id="input-amount"
+                   placeholder="e.g. 1500"
+                   value="1500"
+                   oninput="updateReceiptPreview()">
         </div>
+
         <div class="form-group">
             <label for="input-date">Date Received</label>
-            <input type="date" id="input-date" oninput="updateReceiptPreview()">
+
+            <input type="date"
+                   id="input-date"
+                   oninput="updateReceiptPreview()">
         </div>
-        
-        <button class="download-btn" id="save-snapshot-btn">Download PNG Receipt</button>
+
+        <button class="download-btn" id="save-snapshot-btn">
+            Download PNG Receipt
+        </button>
+
     </div>
 
+    <!-- PREVIEW SIDE -->
     <div class="preview-side">
+
         <div class="receipt-card" id="capture-target-card">
-            
+
             <div class="receipt-header-bar"></div>
-            
+
             <div class="receipt-body">
+
                 <div class="watermark-overlay">
-                    <img class="watermark-img" src="image.png" alt="Watermark Logo">
+                    <img class="watermark-img"
+                         src="image.png"
+                         alt="Watermark Logo">
                 </div>
 
-                <div class="main-title">PAYMENT<br>RECEIVED</div>
-                <div class="pill-badge">Thank You!</div>
-                
-                <div class="message-text">
-                    We are pleased to confirm that your<br>monthly scout fund has been received
+                <div class="main-title">
+                    PAYMENT<br>RECEIVED
                 </div>
-                
+
+                <div class="pill-badge">
+                    Thank You!
+                </div>
+
+                <div class="message-text">
+                    We are pleased to confirm that your<br>
+                    monthly scout fund has been received
+                </div>
+
                 <div class="square-data-box">
+
                     <div class="input-row">
                         <span class="field-label">Scout Name :</span>
                         <span class="field-value" id="view-name"></span>
                     </div>
+
                     <div class="input-row">
                         <span class="field-label">Month :</span>
                         <span class="field-value" id="view-month"></span>
                     </div>
+
                     <div class="input-row">
                         <span class="field-label">Amount :</span>
                         <span class="field-value" id="view-amount"></span>
                     </div>
+
                     <div class="input-row">
                         <span class="field-label">Date :</span>
                         <span class="field-value" id="view-date"></span>
                     </div>
+
                 </div>
+
             </div>
-            
+
             <div class="receipt-footer-bar">
-                Thank you for being a part of our mission !
+                Thank you for being a part of our mission!
             </div>
-            
+
         </div>
+
     </div>
 
 </div>
 
 <script>
-    // Primary Input Selectors
+
+    // INPUT SELECTORS
     const inputName = document.getElementById('input-name');
     const inputMonth = document.getElementById('input-month');
     const inputAmount = document.getElementById('input-amount');
     const inputDate = document.getElementById('input-date');
 
-    // Primary Preview Selectors
+    // PREVIEW SELECTORS
     const viewName = document.getElementById('view-name');
     const viewMonth = document.getElementById('view-month');
     const viewAmount = document.getElementById('view-amount');
     const viewDate = document.getElementById('view-date');
+
     const downloadBtn = document.getElementById('save-snapshot-btn');
 
-    // Fallback default setup on window initialize
+    // SET TODAY DATE AUTOMATICALLY
     const todayDate = new Date();
-   inputDate.value = todayDate.toISOString().split('T')[0]; 
 
-    // Single pipeline function to prevent canvas looping bugs
+    inputDate.value = todayDate.toISOString().split('T')[0];
+
+    // UPDATE RECEIPT PREVIEW
     function updateReceiptPreview() {
+
         viewName.textContent = inputName.value.trim() || "";
+
         viewMonth.textContent = inputMonth.value;
-        viewAmount.textContent = inputAmount.value ? `${inputAmount.value} PKR` : "";
-        
+
+        viewAmount.textContent =
+            inputAmount.value
+            ? `${inputAmount.value} PKR`
+            : "";
+
         const dateVal = inputDate.value;
+
         if (dateVal) {
+
             const segments = dateVal.split('-');
-            viewDate.textContent = `${segments}-${segments}-${segments}`;
+
+            const year = segments[0];
+            const month = segments[1];
+            const day = segments[2];
+
+            viewDate.textContent = `${day}/${month}/${year}`;
+
         } else {
+
             viewDate.textContent = "";
+
         }
     }
 
-    // Run preview rendering sequence immediately on page display load
+    // INITIAL PREVIEW
     updateReceiptPreview();
 
-    // Canvas Capture Execution Link Channel
+    // DOWNLOAD PNG
     downloadBtn.addEventListener('click', () => {
-        const targetCard = document.getElementById('capture-target-card');
-        
+
+        const targetCard =
+            document.getElementById('capture-target-card');
+
         downloadBtn.disabled = true;
         downloadBtn.innerText = "Generating File...";
-        
+
         html2canvas(targetCard, {
-            scale: 3,           
-            useCORS: true,      
+            scale: 3,
+            useCORS: true,
             allowTaint: false,
             logging: false
-        }).then(canvasInstance => {
-            const downloadTrigger = document.createElement('a');
-            const fileTitle = inputName.value.trim().replace(/\s+/g, '_') || 'Scout';
-            
-            downloadTrigger.download = `Ismaili_Scouts_Receipt_${fileTitle}.png`;
-            downloadTrigger.href = canvasInstance.toDataURL('image/png');
+        })
+
+        .then(canvasInstance => {
+
+            const downloadTrigger =
+                document.createElement('a');
+
+            const fileTitle =
+                inputName.value.trim().replace(/\s+/g, '_')
+                || 'Scout';
+
+            downloadTrigger.download =
+                `Ismaili_Scouts_Receipt_${fileTitle}.png`;
+
+            downloadTrigger.href =
+                canvasInstance.toDataURL('image/png');
+
             downloadTrigger.click();
-            
+
             downloadBtn.disabled = false;
-            downloadBtn.innerText = "Download PNG Receipt";
-        }).catch(err => {
+            downloadBtn.innerText =
+                "Download PNG Receipt";
+        })
+
+        .catch(err => {
+
             console.error(err);
+
             downloadBtn.disabled = false;
-            downloadBtn.innerText = "Download PNG Receipt";
+            downloadBtn.innerText =
+                "Download PNG Receipt";
         });
     });
+
 </script>
 
 </body>
